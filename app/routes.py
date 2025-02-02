@@ -9,7 +9,7 @@ wildfire_routes = Blueprint("wildfire_routes", __name__)
 CORS(wildfire_routes)
 
 # Directory to store uploaded files
-UPLOAD_FOLDER = "data"
+UPLOAD_FOLDER = "uploads"
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
