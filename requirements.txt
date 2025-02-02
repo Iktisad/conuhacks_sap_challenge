@@ -39,3 +39,4 @@ urllib3==2.2.3
 vboxapi==1.0
 Werkzeug==3.0.4
 wsproto==1.2.0
+PuLP==2.9.0
