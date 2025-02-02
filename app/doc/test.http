@@ -7,4 +7,4 @@ Content-Type: application/json
 
 ### Get response
 GET http://localhost:5000/optimize_response?file=data/current_wildfiredata.csv
-Content-Type: application/json
+

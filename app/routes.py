@@ -1,7 +1,11 @@
 from flask import Blueprint, jsonify, request
+from flask_cors import CORS  # Import CORS
 from app.utils import process_wildfire_data, load_wildfire_data
 
 wildfire_routes = Blueprint('wildfire_routes', __name__)
+
+# Apply CORS specifically to this blueprint
+CORS(wildfire_routes)
 
 @wildfire_routes.route('/optimize_response', methods=['GET'])
 def optimize_response():
