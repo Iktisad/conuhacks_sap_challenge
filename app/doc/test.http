@@ -1,0 +1,10 @@
+POST http://localhost:5000/data/load_data
+Content-Type: application/json
+
+{
+    "file_path": "data/current_wildfiredata.csv"
+}
+
+### Get response
+GET http://localhost:5000/optimize_response?file=data/current_wildfiredata.csv
+Content-Type: application/json
