@@ -2,9 +2,9 @@ POST http://localhost:5000/data/load_data
 Content-Type: application/json
 
 {
-    "file_path": "data/current_wildfiredata.csv"
+    "file_path": "data/synthetic_wildfiredata_updated.csv"
 }
 
 ### Get response
-GET http://localhost:5000/optimize_response?file=data/current_wildfiredata.csv
+GET http://localhost:5000/optimize_response?file=data/synthetic_wildfiredata_updated.csv
 
