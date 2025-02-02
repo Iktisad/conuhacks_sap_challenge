@@ -9,7 +9,7 @@ Provided Files:
 -	current_wildfiredata.csv: Wildfire occurrence data for the year 2024.
 -	future_environmental_data.csv: Future environmental data for the year 2025.
 
-Part 1: Resource Deployment Optimization
+### Part 1: Resource Deployment Optimization
 Problem Statement:
 Your task is to develop a software solution to optimize the deployment of firefighting resources for the current wildfire season (2024). The optimized solution will minimize operating cost + damage cost. The resources available include different types of firefighting units, each with specific capabilities, deployment times, operational costs, and total availability:
 -	Smoke Jumpers: 30 minutes deployment time, $5,000 per operation, 5 units available.
@@ -58,7 +58,7 @@ Evaluation Criteria
   Fire severity report: {'low': X, 'medium': X, 'high': X}
 ```
 
-OPTIONAL Part 2: Predictive Modeling for Future Fire Occurrences
+### OPTIONAL Part 2: Predictive Modeling for Future Fire Occurrences
 Problem Statement:
 Your task is to develop a predictive model for future fire occurrences using historical data. You will be provided with the following files:
 •	historical_environmental_data.csv: Historical environmental data for the years 2020-2023.
