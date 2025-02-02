@@ -1,6 +1,19 @@
 import pandas as pd
 from datetime import datetime, timedelta
 from collections import deque
+import numpy as np
+import os
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.utils.class_weight import compute_class_weight
+import joblib
+
+
+UPLOAD_FOLDER = "uploads"
+MODEL_DIR = "models"
+if not os.path.exists(MODEL_DIR):
+    os.makedirs(MODEL_DIR)
 
 # Define firefighting resources
 resources = {
@@ -73,3 +86,67 @@ def process_wildfire_data(file_path):
         "Estimated damage costs from missed responses": total_damage_cost,
         "Fire severity report": fires_addressed
     }
+
+def save_uploaded_files(env_file, fire_file, future_env_file):
+    env_path = os.path.join(UPLOAD_FOLDER, env_file.filename)
+    fire_path = os.path.join(UPLOAD_FOLDER, fire_file.filename)
+    future_env_path = os.path.join(UPLOAD_FOLDER, future_env_file.filename)
+
+    env_file.save(env_path)
+    fire_file.save(fire_path)
+    future_env_file.save(future_env_path)
+
+    return {"env_file": env_path, "fire_file": fire_path, "future_env_file": future_env_path}
+
+
+def load_environmental_data(env_file, fire_file, future_env_file):
+    historical_env_data = pd.read_csv(env_file)
+    historical_fire_data = pd.read_csv(fire_file)
+    future_env_data = pd.read_csv(future_env_file)
+
+    historical_env_data['timestamp'] = pd.to_datetime(historical_env_data['timestamp'])
+    historical_fire_data['timestamp'] = pd.to_datetime(historical_fire_data['timestamp'])
+    future_env_data['timestamp'] = pd.to_datetime(future_env_data['timestamp'])
+
+    return historical_env_data, future_env_data
+
+def train_fire_model(historical_env_data):
+    features = ['temperature', 'humidity', 'wind_speed', 'precipitation', 'vegetation_index', 'human_activity_index']
+    target = 'fire_occurred'
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        historical_env_data[features], historical_env_data[target], test_size=0.2, random_state=42, stratify=historical_env_data[target]
+    )
+
+    class_weights = compute_class_weight('balanced', classes=np.unique(y_train), y=y_train)
+    class_weight_dict = {i: class_weights[i] for i in range(len(class_weights))}
+
+    rf = RandomForestClassifier(random_state=42, class_weight=class_weight_dict)
+    rf.fit(X_train, y_train)
+
+    joblib.dump(rf, os.path.join(MODEL_DIR, "wildfire_model.pkl"))
+
+    y_pred = rf.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+
+    return {
+        "message": "Model trained successfully",
+        "accuracy": accuracy,
+        "classification_report": classification_report(y_test, y_pred, output_dict=True),
+    }
+
+
+def predict_wildfire(future_env_file):
+    model_path = os.path.join(MODEL_DIR, "wildfire_model.pkl")
+
+    if not os.path.exists(model_path):
+        return {"error": "Model not trained yet. Train the model first."}
+
+    model = joblib.load(model_path)
+    future_env_data = pd.read_csv(future_env_file)
+
+    features = ['temperature', 'humidity', 'wind_speed', 'precipitation', 'vegetation_index', 'human_activity_index']
+    future_env_data['fire_predicted'] = model.predict(future_env_data[features])
+
+    predicted_fire_locations = future_env_data[future_env_data['fire_predicted'] == 1][['latitude', 'longitude']]
+    return predicted_fire_locations.to_dict(orient="records")
